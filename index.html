@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Study Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <!-- PDF export (client-side) -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app" id="app">
+      <header class="topbar glass">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <span class="dot dot--r"></span>
+            <span class="dot dot--o"></span>
+            <span class="dot dot--g"></span>
+          </div>
+          <div>
+            <div class="brand__title">Smart Study Planner</div>
+            <div class="brand__subtitle">Priority Scheduling + Sorting Visualization (ADSA)</div>
+          </div>
+        </div>
+
+        <div class="topbar__actions">
+          <button class="btn btn--ghost" id="btnDarkMode" title="Toggle dark mode">
+            Dark Mode
+          </button>
+          <label class="btn btn--ghost fileBtn" for="csvImportInput" title="Import tasks from CSV">
+            Import CSV
+          </label>
+          <input id="csvImportInput" type="file" accept=".csv" hidden />
+          <button class="btn btn--ghost" id="btnExportPdf" title="Export tasks to PDF">
+            Export PDF
+          </button>
+          <button class="btn btn--primary" id="btnAddSample">Add Sample Tasks</button>
+        </div>
+      </header>
+
+      <main class="grid">
+        <section class="stats">
+          <div class="stat glass">
+            <div class="stat__label">Total Tasks</div>
+            <div class="stat__value" id="statTotal">0</div>
+            <div class="progress">
+              <div class="progress__bar" id="progressCompletion" style="width: 0%"></div>
+            </div>
+            <div class="stat__hint" id="statCompletionHint">0% completed</div>
+          </div>
+          <div class="stat glass">
+            <div class="stat__label">Completed</div>
+            <div class="stat__value" id="statCompleted">0</div>
+            <div class="stat__hint" id="statAvgCompletion">Avg completion time: —</div>
+          </div>
+          <div class="stat glass">
+            <div class="stat__label">Pending</div>
+            <div class="stat__value" id="statPending">0</div>
+            <div class="stat__hint" id="statProductivity">Productivity score: —</div>
+          </div>
+          <div class="stat glass">
+            <div class="stat__label">High Priority</div>
+            <div class="stat__value" id="statHigh">0</div>
+            <div class="stat__hint" id="statStudyHours">Study hours/day: —</div>
+          </div>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Task Input Form</h2>
+            <div class="panel__sub">Add, edit, and manage tasks with dependencies.</div>
+          </div>
+
+          <form id="taskForm" class="form">
+            <input type="hidden" id="taskId" />
+
+            <div class="form__row">
+              <div class="field">
+                <label for="taskName">Task Name</label>
+                <input id="taskName" required placeholder="e.g., DBMS Assignment" />
+              </div>
+              <div class="field">
+                <label for="taskSubject">Subject / Category</label>
+                <input id="taskSubject" required placeholder="e.g., DBMS" />
+              </div>
+            </div>
+
+            <div class="form__row">
+              <div class="field">
+                <label for="taskPriority">Priority Level</label>
+                <select id="taskPriority" required>
+                  <option value="high">High</option>
+                  <option value="medium">Medium</option>
+                  <option value="low">Low</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="taskDeadline">Deadline (Date + Time)</label>
+                <input id="taskDeadline" type="datetime-local" required />
+              </div>
+            </div>
+
+            <div class="form__row">
+              <div class="field">
+                <label for="taskDuration">Estimated Study Time (hours)</label>
+                <input id="taskDuration" type="number" min="0.25" step="0.25" value="1" required />
+              </div>
+              <div class="field">
+                <label for="taskStatus">Status</label>
+                <select id="taskStatus" required>
+                  <option value="todo">To Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form__row">
+              <div class="field">
+                <label for="taskDepends">Dependencies (comma-separated task IDs)</label>
+                <input id="taskDepends" placeholder="e.g., 2, 5 (optional)" />
+              </div>
+              <div class="field">
+                <label for="taskNotes">Notes</label>
+                <input id="taskNotes" placeholder="Optional" />
+              </div>
+            </div>
+
+            <div class="form__actions">
+              <button class="btn btn--primary" type="submit" id="btnSubmitTask">Add Task</button>
+              <button class="btn btn--ghost" type="button" id="btnClearForm">Clear</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Task List</h2>
+            <div class="panel__sub">Drag to reorder manually, filter/search, or use sorting algorithms.</div>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar__left">
+              <input id="searchInput" class="search" placeholder="Search by task name or subject..." />
+            </div>
+            <div class="toolbar__right">
+              <select id="filterPriority" title="Filter by priority">
+                <option value="">All Priorities</option>
+                <option value="1">High</option>
+                <option value="2">Medium</option>
+                <option value="3">Low</option>
+              </select>
+              <input id="filterSubject" placeholder="Subject filter" title="Filter by subject" />
+              <select id="filterStatus" title="Filter by status">
+                <option value="">All Status</option>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+              <input id="filterDeadline" type="date" title="Filter by deadline date" />
+              <button class="btn btn--ghost" id="btnClearFilters" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="list" id="taskList" aria-label="Task list"></div>
+
+          <div class="notifications" id="notifications" aria-live="polite"></div>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Sorted Task View</h2>
+            <div class="panel__sub">Priority scheduling rules (priority → deadline → duration).</div>
+          </div>
+          <div class="sortedMeta">
+            <div class="chip" id="chipScheduling">Priority Scheduling: enabled</div>
+            <div class="chip" id="chipHeap">Heap scheduling: enabled</div>
+          </div>
+          <div class="list list--compact" id="sortedList"></div>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Algorithm Visualization</h2>
+            <div class="panel__sub">Step-by-step comparisons and swaps on task cards.</div>
+          </div>
+
+          <div class="vizControls">
+            <div class="vizControls__group">
+              <label class="labelInline">
+                Algorithm
+                <select id="algoSelect">
+                  <option value="bubble">Bubble Sort</option>
+                  <option value="selection">Selection Sort</option>
+                  <option value="insertion">Insertion Sort</option>
+                </select>
+              </label>
+              <label class="labelInline">
+                Sort by
+                <select id="sortCriteria">
+                  <option value="priority">Priority</option>
+                  <option value="deadline">Deadline</option>
+                  <option value="duration">Study Time</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="vizControls__group">
+              <button class="btn btn--primary" id="btnStartSort" type="button">Start Sorting</button>
+              <button class="btn btn--ghost" id="btnPauseSort" type="button">Pause</button>
+              <button class="btn btn--ghost" id="btnResetSort" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="algoMeta">
+            <div class="algoMeta__row">
+              <div class="chip" id="algoName">Algorithm: Bubble Sort</div>
+              <div class="chip" id="algoComplexity">Complexity: O(n²)</div>
+              <div class="chip" id="algoSteps">Steps: 0</div>
+            </div>
+            <div class="algoMeta__row">
+              <div class="chip chip--muted" id="algoLegend">
+                Highlight = compare, flash = swap, lock = final position.
+              </div>
+            </div>
+          </div>
+
+          <div class="vizStage" id="vizStage" aria-label="Sorting visualization stage"></div>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Daily Study Plan</h2>
+            <div class="panel__sub">Heap-based scheduling, respecting dependencies.</div>
+          </div>
+
+          <div class="scheduleControls">
+            <label class="labelInline">
+              Start time
+              <input id="scheduleStart" type="time" value="08:00" />
+            </label>
+            <button class="btn btn--primary" id="btnGenerateSchedule" type="button">
+              Generate Daily Plan
+            </button>
+          </div>
+
+          <div class="schedule" id="schedule"></div>
+        </section>
+
+        <section class="panel glass">
+          <div class="panel__header">
+            <h2>Visual Task Board (Kanban)</h2>
+            <div class="panel__sub">Drag tasks across columns to update status.</div>
+          </div>
+
+          <div class="kanban" id="kanban">
+            <div class="kanban__col">
+              <div class="kanban__title">To Do</div>
+              <div class="kanban__list" id="kanbanTodo" data-status="todo"></div>
+            </div>
+            <div class="kanban__col">
+              <div class="kanban__title">In Progress</div>
+              <div class="kanban__list" id="kanbanInProgress" data-status="in_progress"></div>
+            </div>
+            <div class="kanban__col">
+              <div class="kanban__title">Completed</div>
+              <div class="kanban__list" id="kanbanCompleted" data-status="completed"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="footer__left">
+          Built for ADSA: Sorting + Priority Scheduling + Heap / Priority Queue.
+        </div>
+        <div class="footer__right" id="footerClock"></div>
+      </footer>
+    </div>
+
+    <!-- Load as classic scripts so it works on file:// too -->
+    <script src="scheduler.js"></script>
+    <script src="algorithms.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
