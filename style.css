@@ -57,6 +57,10 @@ body {
     linear-gradient(180deg, var(--bg0), var(--bg1));
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .app {
   min-height: 100%;
   display: flex;
@@ -79,6 +83,53 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.navbar {
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  margin: 0 18px 18px;
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.navToggle {
+  display: none;
+}
+
+.navLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.navLink {
+  text-decoration: none;
+  color: var(--muted);
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 160ms ease, background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.navLink:hover {
+  transform: translateY(-1px);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navLink.is-active {
+  color: var(--text);
+  border-color: rgba(74, 163, 255, 0.55);
+  box-shadow: 0 0 0 4px rgba(74, 163, 255, 0.12);
 }
 
 .brand {
@@ -263,6 +314,72 @@ body {
   color: var(--text);
   outline: none;
 }
+
+/* Floating label + icon fields */
+.field--float {
+  position: relative;
+}
+
+.field--float input,
+.field--float select {
+  padding: 14px 12px 10px 38px;
+  height: 46px;
+}
+
+.field__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.9;
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.field--float label {
+  position: absolute;
+  left: 38px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  padding: 0 6px;
+  background: transparent;
+  color: var(--muted);
+  transition: transform 140ms ease, top 140ms ease, color 140ms ease, font-size 140ms ease;
+  pointer-events: none;
+}
+
+.field--float input:focus + label,
+.field--float input:not(:placeholder-shown) + label,
+.field--float select:focus + label {
+  top: 8px;
+  transform: translateY(0);
+  font-size: 11px;
+  color: rgba(74, 163, 255, 0.9);
+}
+
+.field--float select + label {
+  top: 8px;
+  transform: translateY(0);
+  font-size: 11px;
+}
+
+.field__hint {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted2);
+  font-size: 11px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.field--group .fieldGroup {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
 .field input::placeholder {
   color: rgba(255, 255, 255, 0.35);
 }
@@ -423,6 +540,42 @@ body {
   flex-wrap: wrap;
 }
 
+/* Sorted review layout */
+.sortedGrid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+.sortedCol {
+  border-radius: 16px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 10px;
+}
+.sortedCol__title {
+  font-weight: 950;
+  margin-bottom: 8px;
+}
+
+.rankBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.06);
+  font-weight: 900;
+  font-size: 12px;
+}
+.taskCard.is-top {
+  border-color: rgba(255, 77, 90, 0.6);
+  box-shadow: 0 0 0 4px rgba(255, 77, 90, 0.12);
+}
+
 .vizControls {
   margin-top: 12px;
   display: flex;
@@ -519,12 +672,40 @@ body {
   flex-wrap: wrap;
   justify-content: space-between;
 }
-.schedule {
+/* Timeline (Daily Study Plan) */
+.timeline {
   margin-top: 12px;
   display: grid;
   gap: 10px;
+  position: relative;
 }
-.scheduleItem {
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: rgba(255, 255, 255, 0.12);
+}
+[data-theme="light"] .timeline::before {
+  background: rgba(12, 18, 34, 0.12);
+}
+.timelineItem {
+  position: relative;
+  padding-left: 34px;
+}
+.timelineDot {
+  position: absolute;
+  left: 8px;
+  top: 14px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(74, 163, 255, 1), rgba(167, 139, 250, 1));
+  box-shadow: 0 0 0 4px rgba(74, 163, 255, 0.14);
+}
+.timelineCard {
   border-radius: 16px;
   border: 1px solid var(--stroke);
   background: rgba(255, 255, 255, 0.06);
@@ -532,13 +713,14 @@ body {
   display: flex;
   justify-content: space-between;
   gap: 12px;
+  align-items: center;
 }
-.scheduleItem__time {
-  font-weight: 850;
+.timelineTime {
+  font-weight: 950;
 }
-.scheduleItem__task {
+.timelineTask {
   color: var(--muted);
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .kanban {
@@ -553,6 +735,18 @@ body {
   background: rgba(255, 255, 255, 0.04);
   padding: 10px;
 }
+.kanban__col--todo {
+  background: rgba(255, 77, 90, 0.08);
+  border-color: rgba(255, 77, 90, 0.18);
+}
+.kanban__col--inprogress {
+  background: rgba(255, 176, 32, 0.09);
+  border-color: rgba(255, 176, 32, 0.2);
+}
+.kanban__col--done {
+  background: rgba(32, 210, 125, 0.08);
+  border-color: rgba(32, 210, 125, 0.18);
+}
 .kanban__title {
   font-weight: 900;
   margin-bottom: 10px;
@@ -566,8 +760,35 @@ body {
   border-radius: 16px;
   border: 1px solid var(--stroke);
   background: rgba(255, 255, 255, 0.06);
-  padding: 10px;
+  padding: 12px;
   cursor: grab;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+.kanbanCard:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Analytics charts */
+.charts {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.chartCard {
+  border-radius: 16px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.04);
+  padding: 12px;
+}
+.chartCard--wide {
+  grid-column: 1 / -1;
+}
+.chartCard__title {
+  font-weight: 950;
+  margin-bottom: 8px;
 }
 .kanbanCard.dragging {
   opacity: 0.7;
@@ -622,6 +843,15 @@ body {
   .form__row {
     grid-template-columns: 1fr;
   }
+  .field--group .fieldGroup {
+    grid-template-columns: 1fr;
+  }
+  .sortedGrid {
+    grid-template-columns: 1fr;
+  }
+  .charts {
+    grid-template-columns: 1fr;
+  }
   .kanban {
     grid-template-columns: 1fr;
   }
@@ -632,6 +862,17 @@ body {
   .topbar__actions {
     width: 100%;
     justify-content: flex-start;
+  }
+
+  .navToggle {
+    display: inline-flex;
+  }
+  .navLinks {
+    display: none;
+    width: 100%;
+  }
+  .navbar.is-open .navLinks {
+    display: flex;
   }
 }
 

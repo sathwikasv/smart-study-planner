@@ -13,10 +13,12 @@
     <link rel="stylesheet" href="style.css" />
     <!-- PDF export (client-side) -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <!-- Charts (Analytics Dashboard) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
   </head>
   <body>
     <div class="app" id="app">
-      <header class="topbar glass">
+      <header class="topbar glass" id="top">
         <div class="brand">
           <div class="logo" aria-hidden="true">
             <span class="dot dot--r"></span>
@@ -25,7 +27,7 @@
           </div>
           <div>
             <div class="brand__title">Smart Study Planner</div>
-            <div class="brand__subtitle">Priority Scheduling + Sorting Visualization (ADSA)</div>
+            <div class="brand__subtitle">Plan Efficiently, Learn Effectively</div>
           </div>
         </div>
 
@@ -43,6 +45,21 @@
           <button class="btn btn--primary" id="btnAddSample">Add Sample Tasks</button>
         </div>
       </header>
+
+      <!-- Sticky Navigation -->
+      <nav class="navbar glass" id="navbar" aria-label="Primary navigation">
+        <button class="navToggle btn btn--ghost" id="btnNavToggle" type="button" aria-expanded="false">
+          Menu
+        </button>
+        <div class="navLinks" id="navLinks">
+          <a class="navLink" href="#taskFormSection" data-target="taskFormSection">Task Input Form</a>
+          <a class="navLink" href="#taskListSection" data-target="taskListSection">Task List</a>
+          <a class="navLink" href="#sortedReviewSection" data-target="sortedReviewSection">Sorted Task Review</a>
+          <a class="navLink" href="#dailyPlanSection" data-target="dailyPlanSection">Daily Study Plan</a>
+          <a class="navLink" href="#analyticsSection" data-target="analyticsSection">Analytics Dashboard</a>
+          <a class="navLink" href="#kanbanSection" data-target="kanbanSection">Visual Task Board</a>
+        </div>
+      </nav>
 
       <main class="grid">
         <section class="stats">
@@ -71,64 +88,82 @@
           </div>
         </section>
 
-        <section class="panel glass">
+        <section class="panel glass" id="taskFormSection">
           <div class="panel__header">
             <h2>Task Input Form</h2>
             <div class="panel__sub">Add, edit, and manage tasks with dependencies.</div>
           </div>
 
-          <form id="taskForm" class="form">
+          <form id="taskForm" class="form form--upgraded">
             <input type="hidden" id="taskId" />
 
             <div class="form__row">
-              <div class="field">
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">📝</span>
+                <input id="taskName" required placeholder=" " />
                 <label for="taskName">Task Name</label>
-                <input id="taskName" required placeholder="e.g., DBMS Assignment" />
               </div>
-              <div class="field">
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">📚</span>
+                <input id="taskSubject" required placeholder=" " />
                 <label for="taskSubject">Subject / Category</label>
-                <input id="taskSubject" required placeholder="e.g., DBMS" />
               </div>
             </div>
 
             <div class="form__row">
-              <div class="field">
-                <label for="taskPriority">Priority Level</label>
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">🚦</span>
                 <select id="taskPriority" required>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
                   <option value="low">Low</option>
                 </select>
+                <label for="taskPriority">Priority Level</label>
               </div>
-              <div class="field">
-                <label for="taskDeadline">Deadline (Date + Time)</label>
-                <input id="taskDeadline" type="datetime-local" required />
+              <div class="field field--group">
+                <div class="fieldGroup">
+                  <div class="field field--float">
+                    <span class="field__icon" aria-hidden="true">📅</span>
+                    <input id="taskDate" type="date" required placeholder=" " />
+                    <label for="taskDate">Deadline Date</label>
+                  </div>
+                  <div class="field field--float">
+                    <span class="field__icon" aria-hidden="true">⏰</span>
+                    <input id="taskTime" type="time" required placeholder=" " />
+                    <label for="taskTime">Deadline Time</label>
+                    <div class="field__hint" id="taskTimeHint">—</div>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div class="form__row">
-              <div class="field">
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">⏳</span>
+                <input id="taskDuration" type="number" min="0.25" step="0.25" value="1" required placeholder=" " />
                 <label for="taskDuration">Estimated Study Time (hours)</label>
-                <input id="taskDuration" type="number" min="0.25" step="0.25" value="1" required />
               </div>
-              <div class="field">
-                <label for="taskStatus">Status</label>
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">✅</span>
                 <select id="taskStatus" required>
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
                   <option value="completed">Completed</option>
                 </select>
+                <label for="taskStatus">Status</label>
               </div>
             </div>
 
             <div class="form__row">
-              <div class="field">
-                <label for="taskDepends">Dependencies (comma-separated task IDs)</label>
-                <input id="taskDepends" placeholder="e.g., 2, 5 (optional)" />
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">🔗</span>
+                <input id="taskDepends" placeholder=" " />
+                <label for="taskDepends">Dependencies (IDs, comma-separated)</label>
               </div>
-              <div class="field">
+              <div class="field field--float">
+                <span class="field__icon" aria-hidden="true">💡</span>
+                <input id="taskNotes" placeholder=" " />
                 <label for="taskNotes">Notes</label>
-                <input id="taskNotes" placeholder="Optional" />
               </div>
             </div>
 
@@ -139,7 +174,7 @@
           </form>
         </section>
 
-        <section class="panel glass">
+        <section class="panel glass" id="taskListSection">
           <div class="panel__header">
             <h2>Task List</h2>
             <div class="panel__sub">Drag to reorder manually, filter/search, or use sorting algorithms.</div>
@@ -173,68 +208,28 @@
           <div class="notifications" id="notifications" aria-live="polite"></div>
         </section>
 
-        <section class="panel glass">
+        <section class="panel glass" id="sortedReviewSection">
           <div class="panel__header">
-            <h2>Sorted Task View</h2>
-            <div class="panel__sub">Priority scheduling rules (priority → deadline → duration).</div>
+            <h2>Sorted Task Review</h2>
+            <div class="panel__sub">Ranked views by Priority, Deadline, and Study Time.</div>
           </div>
-          <div class="sortedMeta">
-            <div class="chip" id="chipScheduling">Priority Scheduling: enabled</div>
-            <div class="chip" id="chipHeap">Heap scheduling: enabled</div>
+          <div class="sortedGrid">
+            <div class="sortedCol">
+              <div class="sortedCol__title">By Priority</div>
+              <div class="list list--compact" id="sortedByPriority"></div>
+            </div>
+            <div class="sortedCol">
+              <div class="sortedCol__title">By Deadline</div>
+              <div class="list list--compact" id="sortedByDeadline"></div>
+            </div>
+            <div class="sortedCol">
+              <div class="sortedCol__title">By Study Time</div>
+              <div class="list list--compact" id="sortedByDuration"></div>
+            </div>
           </div>
-          <div class="list list--compact" id="sortedList"></div>
         </section>
 
-        <section class="panel glass">
-          <div class="panel__header">
-            <h2>Algorithm Visualization</h2>
-            <div class="panel__sub">Step-by-step comparisons and swaps on task cards.</div>
-          </div>
-
-          <div class="vizControls">
-            <div class="vizControls__group">
-              <label class="labelInline">
-                Algorithm
-                <select id="algoSelect">
-                  <option value="bubble">Bubble Sort</option>
-                  <option value="selection">Selection Sort</option>
-                  <option value="insertion">Insertion Sort</option>
-                </select>
-              </label>
-              <label class="labelInline">
-                Sort by
-                <select id="sortCriteria">
-                  <option value="priority">Priority</option>
-                  <option value="deadline">Deadline</option>
-                  <option value="duration">Study Time</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="vizControls__group">
-              <button class="btn btn--primary" id="btnStartSort" type="button">Start Sorting</button>
-              <button class="btn btn--ghost" id="btnPauseSort" type="button">Pause</button>
-              <button class="btn btn--ghost" id="btnResetSort" type="button">Reset</button>
-            </div>
-          </div>
-
-          <div class="algoMeta">
-            <div class="algoMeta__row">
-              <div class="chip" id="algoName">Algorithm: Bubble Sort</div>
-              <div class="chip" id="algoComplexity">Complexity: O(n²)</div>
-              <div class="chip" id="algoSteps">Steps: 0</div>
-            </div>
-            <div class="algoMeta__row">
-              <div class="chip chip--muted" id="algoLegend">
-                Highlight = compare, flash = swap, lock = final position.
-              </div>
-            </div>
-          </div>
-
-          <div class="vizStage" id="vizStage" aria-label="Sorting visualization stage"></div>
-        </section>
-
-        <section class="panel glass">
+        <section class="panel glass" id="dailyPlanSection">
           <div class="panel__header">
             <h2>Daily Study Plan</h2>
             <div class="panel__sub">Heap-based scheduling, respecting dependencies.</div>
@@ -250,25 +245,51 @@
             </button>
           </div>
 
-          <div class="schedule" id="schedule"></div>
+          <div class="timeline" id="schedule"></div>
         </section>
 
-        <section class="panel glass">
+        <section class="panel glass" id="analyticsSection">
+          <div class="panel__header">
+            <h2>Analytics Dashboard</h2>
+            <div class="panel__sub">Charts update automatically when tasks change.</div>
+          </div>
+
+          <div class="charts">
+            <div class="chartCard">
+              <div class="chartCard__title">Tasks by Priority</div>
+              <canvas id="chartPriority" height="180"></canvas>
+            </div>
+            <div class="chartCard">
+              <div class="chartCard__title">Task Status</div>
+              <canvas id="chartStatus" height="180"></canvas>
+            </div>
+            <div class="chartCard chartCard--wide">
+              <div class="chartCard__title">Study Hours per Day</div>
+              <canvas id="chartHours" height="160"></canvas>
+            </div>
+            <div class="chartCard chartCard--wide">
+              <div class="chartCard__title">Productivity Trend</div>
+              <canvas id="chartProductivity" height="160"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel glass" id="kanbanSection">
           <div class="panel__header">
             <h2>Visual Task Board (Kanban)</h2>
             <div class="panel__sub">Drag tasks across columns to update status.</div>
           </div>
 
           <div class="kanban" id="kanban">
-            <div class="kanban__col">
+            <div class="kanban__col kanban__col--todo">
               <div class="kanban__title">To Do</div>
               <div class="kanban__list" id="kanbanTodo" data-status="todo"></div>
             </div>
-            <div class="kanban__col">
+            <div class="kanban__col kanban__col--inprogress">
               <div class="kanban__title">In Progress</div>
               <div class="kanban__list" id="kanbanInProgress" data-status="in_progress"></div>
             </div>
-            <div class="kanban__col">
+            <div class="kanban__col kanban__col--done">
               <div class="kanban__title">Completed</div>
               <div class="kanban__list" id="kanbanCompleted" data-status="completed"></div>
             </div>
@@ -286,7 +307,6 @@
 
     <!-- Load as classic scripts so it works on file:// too -->
     <script src="scheduler.js"></script>
-    <script src="algorithms.js"></script>
     <script src="script.js"></script>
   </body>
 </html>
