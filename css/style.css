@@ -61,6 +61,15 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Heading + section spacing (prevents overlap) */
+h2,
+h3 {
+  margin: 0 0 10px;
+}
+.section {
+  margin-bottom: 40px;
+}
+
 .app {
   min-height: 100%;
   display: flex;
@@ -292,6 +301,40 @@ html {
   display: grid;
   gap: 10px;
 }
+
+/* Form layout fix (no overlap) */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+  align-items: start;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.form-group label {
+  margin-bottom: 0;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.form-group input,
+.form-group select {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  outline: none;
+  width: 100%;
+}
+.timeHint {
+  font-size: 12px;
+  color: var(--muted2);
+  font-weight: 800;
+}
 .form__row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -313,72 +356,6 @@ html {
   background: rgba(255, 255, 255, 0.06);
   color: var(--text);
   outline: none;
-}
-
-/* Floating label + icon fields */
-.field--float {
-  position: relative;
-}
-
-.field--float input,
-.field--float select {
-  padding: 14px 12px 10px 38px;
-  height: 46px;
-}
-
-.field__icon {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0.9;
-  pointer-events: none;
-  font-size: 14px;
-}
-
-.field--float label {
-  position: absolute;
-  left: 38px;
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
-  padding: 0 6px;
-  background: transparent;
-  color: var(--muted);
-  transition: transform 140ms ease, top 140ms ease, color 140ms ease, font-size 140ms ease;
-  pointer-events: none;
-}
-
-.field--float input:focus + label,
-.field--float input:not(:placeholder-shown) + label,
-.field--float select:focus + label {
-  top: 8px;
-  transform: translateY(0);
-  font-size: 11px;
-  color: rgba(74, 163, 255, 0.9);
-}
-
-.field--float select + label {
-  top: 8px;
-  transform: translateY(0);
-  font-size: 11px;
-}
-
-.field__hint {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted2);
-  font-size: 11px;
-  font-weight: 800;
-  pointer-events: none;
-}
-
-.field--group .fieldGroup {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
 }
 .field input::placeholder {
   color: rgba(255, 255, 255, 0.35);
@@ -771,24 +748,32 @@ html {
 }
 
 /* Analytics charts */
-.charts {
-  margin-top: 12px;
+.charts-container {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px 0 0;
 }
-.chartCard {
-  border-radius: 16px;
+
+.chart-card {
+  height: 250px;
+  max-height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  padding: 10px;
   border: 1px solid var(--stroke);
-  background: rgba(255, 255, 255, 0.04);
-  padding: 12px;
+  position: relative;
 }
-.chartCard--wide {
-  grid-column: 1 / -1;
-}
-.chartCard__title {
+
+.chartTitle {
   font-weight: 950;
-  margin-bottom: 8px;
+  margin: 2px 2px 10px;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: calc(100% - 28px) !important;
+  display: block;
 }
 .kanbanCard.dragging {
   opacity: 0.7;
@@ -849,7 +834,7 @@ html {
   .sortedGrid {
     grid-template-columns: 1fr;
   }
-  .charts {
+  .charts-container {
     grid-template-columns: 1fr;
   }
   .kanban {
@@ -873,6 +858,15 @@ html {
   }
   .navbar.is-open .navLinks {
     display: flex;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .charts-container {
+    grid-template-columns: 1fr;
   }
 }
 

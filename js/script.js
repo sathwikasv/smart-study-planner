@@ -80,6 +80,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return `${String(h12).padStart(2, "0")}:${String(mm).padStart(2, "0")} ${suffix}`;
   }
 
+  function formatTimeTo12Hr(time) {
+    let [hour, minute] = String(time || "").split(":");
+    hour = Number(hour);
+    minute = String(minute ?? "00").padStart(2, "0");
+    if (!Number.isFinite(hour)) return "—";
+    let ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  }
+
   function deadlineFromDateTime(dateStr, timeStr) {
     const d = String(dateStr || "").trim();
     const t = String(timeStr || "").trim();
@@ -110,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const PRIORITY_STR_TO_NUM = { high: 1, medium: 2, low: 3 };
-  const PRIORITY_NUM_TO_STR = { 1: "high", 2: "medium", 3: "low" };
+  const PRIORITY_NUM_TO_STR = { 1: "1", 2: "2", 3: "3" };
 
   function priorityLabel(p) {
     return S.priorityLabel(p);
@@ -357,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------
   function taskCardHtml(t, { rank = null, highlightTop = false } = {}) {
     const deps = (t.dependencies || []).length ? `Deps: ${t.dependencies.join(", ")}` : "Deps: —";
-    const pill = `<span class="pill ${priorityClass(t.priority)}">${priorityLabel(t.priority)} (P${t.priority})</span>`;
+    const pill = `<span class="pill ${priorityClass(t.priority)}">P${t.priority}</span>`;
     const due = formatDeadline(t.deadline);
     const rankChip = rank != null ? `<span class="rankBadge">#${rank}</span>` : "";
 
@@ -562,6 +572,14 @@ document.addEventListener("DOMContentLoaded", () => {
   function initCharts() {
     if (!ChartLib) return;
 
+    // Destroy previous instances before re-init (prevents lag/freezing)
+    for (const k of Object.keys(charts)) {
+      if (charts[k]) {
+        charts[k].destroy();
+        charts[k] = null;
+      }
+    }
+
     const commonOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -692,7 +710,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (charts.hours) {
       charts.hours.data.labels = keys;
-      charts.hours.data.datasets[0].data = keys.map((k) => Number(hoursByDay[k] || 0).toFixed(2));
+      charts.hours.data.datasets[0].data = keys.map((k) => Number(hoursByDay[k] || 0));
       charts.hours.update();
     }
 
@@ -719,7 +737,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("taskId").value = "";
     $("taskName").value = "";
     $("taskSubject").value = "";
-    $("taskPriority").value = "high";
+    $("taskPriority").value = "1";
     $("taskDate").value = "";
     $("taskTime").value = "";
     $("taskDuration").value = "1";
@@ -734,7 +752,7 @@ document.addEventListener("DOMContentLoaded", () => {
     $("taskId").value = String(t.id);
     $("taskName").value = t.name || "";
     $("taskSubject").value = t.subject || "";
-    $("taskPriority").value = PRIORITY_NUM_TO_STR[t.priority] || "medium";
+    $("taskPriority").value = String(t.priority || 2);
     const { date, time } = splitDeadline(t.deadline);
     $("taskDate").value = date || "";
     $("taskTime").value = time || "";
@@ -751,8 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const idExisting = $("taskId").value ? Number($("taskId").value) : null;
     const name = String($("taskName").value || "").trim();
     const subject = String($("taskSubject").value || "").trim();
-    const priorityStr = $("taskPriority").value || "medium";
-    const priority = PRIORITY_STR_TO_NUM[priorityStr] ?? 2;
+    const priority = Number($("taskPriority").value) || 2;
     const date = String($("taskDate").value || "").trim();
     const time = String($("taskTime").value || "").trim();
     const deadline = deadlineFromDateTime(date, time);
@@ -1161,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateTimeHint() {
     const hint = $("taskTimeHint");
     if (!hint) return;
-    hint.textContent = time24To12h($("taskTime").value);
+    hint.textContent = formatTimeTo12Hr($("taskTime").value);
   }
 
   // ----------------------------

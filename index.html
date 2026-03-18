@@ -88,83 +88,63 @@
           </div>
         </section>
 
-        <section class="panel glass" id="taskFormSection">
+        <section class="panel glass section" id="taskFormSection">
           <div class="panel__header">
             <h2>Task Input Form</h2>
             <div class="panel__sub">Add, edit, and manage tasks with dependencies.</div>
           </div>
 
-          <form id="taskForm" class="form form--upgraded">
+          <form id="taskForm" class="form form-grid">
             <input type="hidden" id="taskId" />
 
-            <div class="form__row">
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">📝</span>
-                <input id="taskName" required placeholder=" " />
-                <label for="taskName">Task Name</label>
-              </div>
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">📚</span>
-                <input id="taskSubject" required placeholder=" " />
-                <label for="taskSubject">Subject / Category</label>
-              </div>
+            <div class="form-group">
+              <label for="taskName">Task Name</label>
+              <input id="taskName" required placeholder="e.g., DBMS Assignment" />
+            </div>
+            <div class="form-group">
+              <label for="taskSubject">Subject / Category</label>
+              <input id="taskSubject" required placeholder="e.g., DBMS" />
             </div>
 
-            <div class="form__row">
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">🚦</span>
-                <select id="taskPriority" required>
-                  <option value="high">High</option>
-                  <option value="medium">Medium</option>
-                  <option value="low">Low</option>
-                </select>
-                <label for="taskPriority">Priority Level</label>
-              </div>
-              <div class="field field--group">
-                <div class="fieldGroup">
-                  <div class="field field--float">
-                    <span class="field__icon" aria-hidden="true">📅</span>
-                    <input id="taskDate" type="date" required placeholder=" " />
-                    <label for="taskDate">Deadline Date</label>
-                  </div>
-                  <div class="field field--float">
-                    <span class="field__icon" aria-hidden="true">⏰</span>
-                    <input id="taskTime" type="time" required placeholder=" " />
-                    <label for="taskTime">Deadline Time</label>
-                    <div class="field__hint" id="taskTimeHint">—</div>
-                  </div>
-                </div>
-              </div>
+            <div class="form-group">
+              <label for="taskPriority">Priority</label>
+              <select id="taskPriority" required>
+                <option value="1">High</option>
+                <option value="2">Medium</option>
+                <option value="3">Low</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="taskStatus">Status</label>
+              <select id="taskStatus" required>
+                <option value="todo">To Do</option>
+                <option value="in_progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
             </div>
 
-            <div class="form__row">
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">⏳</span>
-                <input id="taskDuration" type="number" min="0.25" step="0.25" value="1" required placeholder=" " />
-                <label for="taskDuration">Estimated Study Time (hours)</label>
-              </div>
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">✅</span>
-                <select id="taskStatus" required>
-                  <option value="todo">To Do</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-                <label for="taskStatus">Status</label>
-              </div>
+            <div class="form-group">
+              <label for="taskDate">Deadline Date</label>
+              <input id="taskDate" type="date" required />
+            </div>
+            <div class="form-group">
+              <label for="taskTime">Deadline Time</label>
+              <input id="taskTime" type="time" required />
+              <div class="timeHint" id="taskTimeHint">—</div>
             </div>
 
-            <div class="form__row">
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">🔗</span>
-                <input id="taskDepends" placeholder=" " />
-                <label for="taskDepends">Dependencies (IDs, comma-separated)</label>
-              </div>
-              <div class="field field--float">
-                <span class="field__icon" aria-hidden="true">💡</span>
-                <input id="taskNotes" placeholder=" " />
-                <label for="taskNotes">Notes</label>
-              </div>
+            <div class="form-group">
+              <label for="taskDuration">Estimated Study Time (hours)</label>
+              <input id="taskDuration" type="number" min="0.25" step="0.25" value="1" required />
+            </div>
+            <div class="form-group">
+              <label for="taskDepends">Dependencies (IDs, comma-separated)</label>
+              <input id="taskDepends" placeholder="e.g., 2, 5 (optional)" />
+            </div>
+
+            <div class="form-group">
+              <label for="taskNotes">Notes</label>
+              <input id="taskNotes" placeholder="Optional" />
             </div>
 
             <div class="form__actions">
@@ -174,7 +154,7 @@
           </form>
         </section>
 
-        <section class="panel glass" id="taskListSection">
+        <section class="panel glass section" id="taskListSection">
           <div class="panel__header">
             <h2>Task List</h2>
             <div class="panel__sub">Drag to reorder manually, filter/search, or use sorting algorithms.</div>
@@ -208,7 +188,7 @@
           <div class="notifications" id="notifications" aria-live="polite"></div>
         </section>
 
-        <section class="panel glass" id="sortedReviewSection">
+        <section class="panel glass section" id="sortedReviewSection">
           <div class="panel__header">
             <h2>Sorted Task Review</h2>
             <div class="panel__sub">Ranked views by Priority, Deadline, and Study Time.</div>
@@ -229,7 +209,7 @@
           </div>
         </section>
 
-        <section class="panel glass" id="dailyPlanSection">
+        <section class="panel glass section" id="dailyPlanSection">
           <div class="panel__header">
             <h2>Daily Study Plan</h2>
             <div class="panel__sub">Heap-based scheduling, respecting dependencies.</div>
@@ -248,33 +228,33 @@
           <div class="timeline" id="schedule"></div>
         </section>
 
-        <section class="panel glass" id="analyticsSection">
+        <section class="panel glass section" id="analyticsSection">
           <div class="panel__header">
             <h2>Analytics Dashboard</h2>
             <div class="panel__sub">Charts update automatically when tasks change.</div>
           </div>
 
-          <div class="charts">
-            <div class="chartCard">
-              <div class="chartCard__title">Tasks by Priority</div>
-              <canvas id="chartPriority" height="180"></canvas>
+          <div class="charts-container">
+            <div class="chart-card">
+              <div class="chartTitle">Tasks by Priority</div>
+              <canvas id="chartPriority"></canvas>
             </div>
-            <div class="chartCard">
-              <div class="chartCard__title">Task Status</div>
-              <canvas id="chartStatus" height="180"></canvas>
+            <div class="chart-card">
+              <div class="chartTitle">Task Status</div>
+              <canvas id="chartStatus"></canvas>
             </div>
-            <div class="chartCard chartCard--wide">
-              <div class="chartCard__title">Study Hours per Day</div>
-              <canvas id="chartHours" height="160"></canvas>
+            <div class="chart-card">
+              <div class="chartTitle">Study Hours per Day</div>
+              <canvas id="chartHours"></canvas>
             </div>
-            <div class="chartCard chartCard--wide">
-              <div class="chartCard__title">Productivity Trend</div>
-              <canvas id="chartProductivity" height="160"></canvas>
+            <div class="chart-card">
+              <div class="chartTitle">Productivity Trend</div>
+              <canvas id="chartProductivity"></canvas>
             </div>
           </div>
         </section>
 
-        <section class="panel glass" id="kanbanSection">
+        <section class="panel glass section" id="kanbanSection">
           <div class="panel__header">
             <h2>Visual Task Board (Kanban)</h2>
             <div class="panel__sub">Drag tasks across columns to update status.</div>
